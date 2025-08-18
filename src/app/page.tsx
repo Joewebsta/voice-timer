@@ -1,31 +1,30 @@
 "use client";
 
-import { useTimerVoiceInput } from "@/hooks/useTimerVoiceInput";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { useTimer } from "@/hooks/useTimer";
+import { parseDuration } from "@/utils/utils";
 
 export default function Home() {
-  const {
-    speechRecognitionInstance,
-    isListening,
-    setIsListening,
-    isRunning,
-    remainingSeconds,
-    resetTimer,
-    stopTimer,
-  } = useTimerVoiceInput();
+  const { remainingSeconds, isRunning, startTimer, stopTimer } = useTimer();
+
+  const handleVoiceInput = (transcript: string) => {
+    const parsedDuration = parseDuration(transcript);
+    const totalSeconds =
+      parsedDuration.hours * 3600 +
+      parsedDuration.minutes * 60 +
+      parsedDuration.seconds;
+
+    startTimer(totalSeconds);
+  };
+
+  const { isListening, startListening, stopListening } =
+    useSpeechRecognition(handleVoiceInput);
 
   const handleClick = async () => {
-    if (speechRecognitionInstance.current) {
-      if (isListening) {
-        speechRecognitionInstance.current.stop();
-        setIsListening(false);
-        console.log("Stopped listening");
-      } else {
-        setIsListening(true);
-        speechRecognitionInstance.current.start();
-        console.log("Ready to receive a timer command.");
-      }
+    if (isListening) {
+      stopListening();
     } else {
-      console.log("Speech recognition not available");
+      startListening();
     }
   };
 

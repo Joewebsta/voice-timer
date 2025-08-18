@@ -41,8 +41,8 @@ function useTimer() {
   };
 
   return {
-    remainingSeconds,
     isRunning,
+    remainingSeconds,
     setRemainingSeconds,
     startTimer,
     stopTimer,
