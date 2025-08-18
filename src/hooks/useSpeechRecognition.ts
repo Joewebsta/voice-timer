@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
-const SPEECH_CONFIG = {
+const TIMER_SPEECH_GRAMMAR_CONFIG = {
   grammar: `#JSGF V1.0; grammar timer; public <timer> = (set | start | create) (a | an) timer for <number> <unit> | <number> <unit> timer | timer for <number> <unit>; <number> = one | two | three | four | five | six | seven | eight | nine | ten | eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen | eighteen | nineteen | twenty | thirty | forty | fifty | sixty | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 30 | 40 | 50 | 60; <unit> = minute | minutes | second | seconds | hour | hours;`,
   language: "en-US",
   maxAlternatives: 1,
 } as const;
 
-interface OnTranscriptCallback {
+interface VoiceTranscriptHandler {
   (transcript: string): void;
 }
 
-function useSpeechRecognition(onTranscript: OnTranscriptCallback) {
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
+  const speechRecognitionInstance = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [error, setError] = useState("");
+  const [recognitionError, setRecognitionError] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -24,54 +24,55 @@ function useSpeechRecognition(onTranscript: OnTranscriptCallback) {
         window.SpeechGrammarList || window.webkitSpeechGrammarList;
 
       if (SpeechRecognition && SpeechGrammarList) {
-        const recognition = new SpeechRecognition();
-        const speechRecognitionList = new SpeechGrammarList();
-        speechRecognitionList.addFromString(SPEECH_CONFIG.grammar, 1);
-        recognition.grammars = speechRecognitionList;
-        recognition.continuous = false;
-        recognition.lang = SPEECH_CONFIG.language;
-        recognition.interimResults = false;
-        recognition.maxAlternatives = SPEECH_CONFIG.maxAlternatives;
+        const recognitionInstance = new SpeechRecognition();
+        const grammarList = new SpeechGrammarList();
+        grammarList.addFromString(TIMER_SPEECH_GRAMMAR_CONFIG.grammar, 1);
+        recognitionInstance.grammars = grammarList;
+        recognitionInstance.continuous = false;
+        recognitionInstance.lang = TIMER_SPEECH_GRAMMAR_CONFIG.language;
+        recognitionInstance.interimResults = false;
+        recognitionInstance.maxAlternatives =
+          TIMER_SPEECH_GRAMMAR_CONFIG.maxAlternatives;
 
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          const transcript = event.results[0][0].transcript;
-          onTranscript(transcript);
-          console.log("transcript", transcript);
+        recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
+          const recognizedText = event.results[0][0].transcript;
+          onTranscriptReceived(recognizedText);
+          console.log("Recognized text:", recognizedText);
         };
 
-        recognition.onnomatch = () => {
-          console.log("No match!");
+        recognitionInstance.onnomatch = () => {
+          console.log("No speech match found");
         };
 
-        recognition.onspeechend = () => {
-          console.log("Speech recognition ended");
-          recognition.stop();
+        recognitionInstance.onspeechend = () => {
+          console.log("Speech recognition session ended");
+          recognitionInstance.stop();
           setIsListening(false);
         };
 
-        recognition.onerror = (event) => {
-          setError(`Speech recognition error: ${event.error}`);
+        recognitionInstance.onerror = (event) => {
+          setRecognitionError(`Speech recognition error: ${event.error}`);
           setIsListening(false);
         };
 
-        recognitionRef.current = recognition;
+        speechRecognitionInstance.current = recognitionInstance;
       }
     }
 
     return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-        recognitionRef.current.abort();
+      if (speechRecognitionInstance.current) {
+        speechRecognitionInstance.current.stop();
+        speechRecognitionInstance.current.abort();
       }
 
-      recognitionRef.current = null;
+      speechRecognitionInstance.current = null;
     };
-  }, [onTranscript]);
+  }, [onTranscriptReceived]);
 
   return {
-    recognitionRef,
+    speechRecognitionInstance,
     isListening,
-    error,
+    recognitionError,
     setIsListening,
   };
 }
