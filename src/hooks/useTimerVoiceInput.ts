@@ -5,6 +5,7 @@ function useTimerVoiceInput() {
   const [isListening, setIsListening] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const grammar = `
@@ -57,6 +58,11 @@ public
           setIsRunning(true);
           setTimerSeconds(totalSeconds);
           console.log("Total seconds:", totalSeconds);
+        };
+
+        recognition.onerror = (event) => {
+          setError(`Speech recognition error: ${event.error}`);
+          setIsListening(false);
         };
 
         recognitionRef.current = recognition;
