@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
 function useTimer() {
-  const timerIntervalId = useRef<null | NodeJS.Timeout>(null);
+  const intervalIdRef = useRef<null | NodeJS.Timeout>(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
 
   useEffect(() => {
     if (isRunning) {
       const intervalId = setInterval(() => {
-        setTimerSeconds((prevSeconds) => {
+        setRemainingSeconds((prevSeconds) => {
           if (prevSeconds === null || prevSeconds <= 0) {
             setIsRunning(false);
             return 0;
@@ -17,35 +17,35 @@ function useTimer() {
         });
       }, 1000);
 
-      timerIntervalId.current = intervalId;
+      intervalIdRef.current = intervalId;
     }
   }, [isRunning]);
 
-  const startTimer = (seconds: number) => {
-    setTimerSeconds(seconds);
+  const startTimer = (durationInSeconds: number) => {
+    setRemainingSeconds(durationInSeconds);
     setIsRunning(true);
   };
 
-  const cancelTimer = () => {
-    console.log("Cancel timer");
-    if (timerIntervalId.current) {
-      clearInterval(timerIntervalId.current);
-      timerIntervalId.current = null;
+  const stopTimer = () => {
+    console.log("Stopping timer");
+    if (intervalIdRef.current) {
+      clearInterval(intervalIdRef.current);
+      intervalIdRef.current = null;
       resetTimer();
     }
   };
 
   const resetTimer = () => {
-    setTimerSeconds(null);
+    setRemainingSeconds(null);
     setIsRunning(false);
   };
 
   return {
-    timerSeconds,
+    remainingSeconds,
     isRunning,
-    setTimerSeconds,
+    setRemainingSeconds,
     startTimer,
-    cancelTimer,
+    stopTimer,
     resetTimer,
   };
 }
