@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 function useTimerVoiceInput() {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState<number | null>(null);
 
   useEffect(() => {
@@ -53,6 +54,7 @@ public
             durationData.minutes * 60 +
             durationData.seconds;
 
+          setIsRunning(true);
           setTimerSeconds(totalSeconds);
           console.log("Total seconds:", totalSeconds);
         };
@@ -62,11 +64,20 @@ public
     }
   }, []);
 
+  const resetTimer = () => {
+    setTimerSeconds(null);
+    setIsRunning(false);
+  };
+
   return {
     recognitionRef,
     timerSeconds,
     isListening,
+    isRunning,
     setIsListening,
+    setTimerSeconds, // Direct control
+    startTimer: (seconds: number) => setTimerSeconds(seconds), // Convenience
+    resetTimer,
   };
 }
 
