@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
+const SPEECH_CONFIG = {
+  grammar: `#JSGF V1.0; grammar timer; public <timer> = (set | start | create) (a | an) timer for <number> <unit> | <number> <unit> timer | timer for <number> <unit>; <number> = one | two | three | four | five | six | seven | eight | nine | ten | eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen | eighteen | nineteen | twenty | thirty | forty | fifty | sixty | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 30 | 40 | 50 | 60; <unit> = minute | minutes | second | seconds | hour | hours;`,
+  language: "en-US",
+  maxAlternatives: 1,
+} as const;
+
 function useTimerVoiceInput() {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -8,15 +14,6 @@ function useTimerVoiceInput() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const grammar = `
-#JSGF V1.0;
-grammar timer;
-public
-<timer> = (set | start | create) (a | an) timer for <number> <unit> | <number> <unit> timer | timer for <number> <unit>;
-<number> = one | two | three | four | five | six | seven | eight | nine | ten | eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen | eighteen | nineteen | twenty | thirty | forty | fifty | sixty | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 30 | 40 | 50 | 60;
-<unit> = minute | minutes | second | seconds | hour | hours;
-`;
-
     // Initialize speech recognition only on client side
     if (typeof window !== "undefined") {
       // Browser compatibility
@@ -28,12 +25,12 @@ public
       if (SpeechRecognition && SpeechGrammarList) {
         const recognition = new SpeechRecognition();
         const speechRecognitionList = new SpeechGrammarList();
-        speechRecognitionList.addFromString(grammar, 1);
+        speechRecognitionList.addFromString(SPEECH_CONFIG.grammar, 1);
         recognition.grammars = speechRecognitionList;
         recognition.continuous = false;
-        recognition.lang = "en-US";
+        recognition.lang = SPEECH_CONFIG.language;
         recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
+        recognition.maxAlternatives = SPEECH_CONFIG.maxAlternatives;
 
         recognition.onnomatch = () => {
           console.log("No match!");
