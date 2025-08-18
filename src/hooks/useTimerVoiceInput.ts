@@ -4,36 +4,36 @@ import { parseDuration } from "@/utils/utils";
 
 function useTimerVoiceInput() {
   const {
-    timerSeconds,
+    remainingSeconds,
     isRunning,
     resetTimer,
     startTimer,
-    cancelTimer,
-    setTimerSeconds,
+    stopTimer,
+    setRemainingSeconds,
   } = useTimer();
 
-  const handleTranscript = (transcript: string) => {
-    const durationData = parseDuration(transcript);
+  const handleVoiceInput = (transcript: string) => {
+    const parsedDuration = parseDuration(transcript);
     const totalSeconds =
-      durationData.hours * 3600 +
-      durationData.minutes * 60 +
-      durationData.seconds;
+      parsedDuration.hours * 3600 +
+      parsedDuration.minutes * 60 +
+      parsedDuration.seconds;
 
     startTimer(totalSeconds);
   };
 
-  const { recognitionRef, isListening, setIsListening } =
-    useSpeechRecognition(handleTranscript);
+  const { speechRecognitionInstance, isListening, setIsListening } =
+    useSpeechRecognition(handleVoiceInput);
 
   return {
-    recognitionRef,
-    timerSeconds,
+    speechRecognitionInstance,
+    remainingSeconds,
     isListening,
     isRunning,
     setIsListening,
-    setTimerSeconds,
+    setRemainingSeconds,
     resetTimer,
-    cancelTimer,
+    stopTimer,
   };
 }
 
