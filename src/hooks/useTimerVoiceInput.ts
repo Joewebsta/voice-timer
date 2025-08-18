@@ -62,6 +62,15 @@ public
         recognitionRef.current = recognition;
       }
     }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current.abort();
+      }
+
+      recognitionRef.current = null;
+    };
   }, []);
 
   const resetTimer = () => {
