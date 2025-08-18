@@ -69,11 +69,30 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
     };
   }, [onTranscriptReceived]);
 
+  const startListening = () => {
+    if (speechRecognitionInstance.current) {
+      setIsListening(true);
+      speechRecognitionInstance.current.start();
+      console.log("Ready to receive a timer command.");
+    } else {
+      console.log("Speech recognition not available");
+    }
+  };
+
+  const stopListening = () => {
+    if (speechRecognitionInstance.current) {
+      speechRecognitionInstance.current.stop();
+      setIsListening(false);
+      console.log("Stopped listening");
+    }
+  };
+
   return {
-    speechRecognitionInstance,
     isListening,
+    speechRecognitionInstance,
     recognitionError,
-    setIsListening,
+    startListening,
+    stopListening,
   };
 }
 
