@@ -1,53 +1,31 @@
 "use client";
 
 import { useTimerVoiceInput } from "@/hooks/useTimerVoiceInput";
-import { useEffect, useRef } from "react";
 
 export default function Home() {
-  const timerIntervalId = useRef<null | NodeJS.Timeout>(null);
-
   const {
-    recognitionRef,
+    speechRecognitionInstance,
     isListening,
     setIsListening,
-    setTimerSeconds,
     isRunning,
-    timerSeconds,
+    remainingSeconds,
     resetTimer,
+    stopTimer,
   } = useTimerVoiceInput();
 
-  useEffect(() => {
-    if (isRunning) {
-      const intervalId = setInterval(() => {
-        setTimerSeconds((prevSeconds) => prevSeconds - 1);
-      }, 1000);
-
-      timerIntervalId.current = intervalId;
-    }
-  }, [isRunning, setTimerSeconds]);
-
   const handleClick = async () => {
-    if (recognitionRef.current) {
+    if (speechRecognitionInstance.current) {
       if (isListening) {
-        recognitionRef.current.stop();
+        speechRecognitionInstance.current.stop();
         setIsListening(false);
         console.log("Stopped listening");
       } else {
         setIsListening(true);
-        recognitionRef.current.start();
+        speechRecognitionInstance.current.start();
         console.log("Ready to receive a timer command.");
       }
     } else {
       console.log("Speech recognition not available");
-    }
-  };
-
-  const handleCancelTimer = () => {
-    console.log("Cancel timer");
-    if (timerIntervalId.current) {
-      clearInterval(timerIntervalId.current);
-      timerIntervalId.current = null;
-      resetTimer();
     }
   };
 
@@ -69,7 +47,7 @@ export default function Home() {
       {isRunning && (
         <div>
           <button
-            onClick={handleCancelTimer}
+            onClick={stopTimer}
             className="w-fit border p-3 rounded-md font-medium transition-colors"
           >
             Cancel
@@ -81,7 +59,7 @@ export default function Home() {
       )}
 
       <div>
-        <p>{timerSeconds}</p>
+        <p>{remainingSeconds}</p>
       </div>
     </div>
   );
