@@ -1,7 +1,7 @@
-function parseDuration(transcript: string) {
-  const result = { hours: 0, minutes: 0, seconds: 0 };
+function parseDurationFromTranscript(transcript: string) {
+  const duration = { hours: 0, minutes: 0, seconds: 0 };
 
-  const wordMap: Record<string, string> = {
+  const numberWordMapping: Record<string, string> = {
     one: "1",
     two: "2",
     three: "3",
@@ -28,21 +28,24 @@ function parseDuration(transcript: string) {
     sixty: "60",
   };
 
-  let text = transcript.toLowerCase();
+  let processedText = transcript.toLowerCase();
 
-  Object.entries(wordMap).forEach(([word, num]) => {
-    text = text.replace(new RegExp(`\\b${word}\\b`, "g"), num);
+  Object.entries(numberWordMapping).forEach(([word, number]) => {
+    processedText = processedText.replace(
+      new RegExp(`\\b${word}\\b`, "g"),
+      number
+    );
   });
 
-  const hourMatch = text.match(/(\d+)\s*hours?/);
-  const minuteMatch = text.match(/(\d+)\s*minutes?/);
-  const secondMatch = text.match(/(\d+)\s*seconds?/);
+  const hoursPattern = processedText.match(/(\d+)\s*hours?/);
+  const minutesPattern = processedText.match(/(\d+)\s*minutes?/);
+  const secondsPattern = processedText.match(/(\d+)\s*seconds?/);
 
-  if (hourMatch) result.hours = parseInt(hourMatch[1]);
-  if (minuteMatch) result.minutes = parseInt(minuteMatch[1]);
-  if (secondMatch) result.seconds = parseInt(secondMatch[1]);
+  if (hoursPattern) duration.hours = parseInt(hoursPattern[1]);
+  if (minutesPattern) duration.minutes = parseInt(minutesPattern[1]);
+  if (secondsPattern) duration.seconds = parseInt(secondsPattern[1]);
 
-  return result;
+  return duration;
 }
 
-export { parseDuration };
+export { parseDurationFromTranscript as parseDuration };
