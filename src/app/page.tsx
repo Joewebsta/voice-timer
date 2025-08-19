@@ -56,18 +56,20 @@ export default function Home() {
 
   return (
     <div>
-      {!isRunning && !isPaused && (
-        <button
-          onClick={toggleSpeechRecognition}
-          className={`w-fit p-3 rounded-md font-medium transition-colors ${
-            isListening
-              ? "bg-red-500 hover:bg-red-600 text-white"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
-          }`}
-        >
-          {isListening ? "Stop Listening" : "Start Voice Recognition"}
-        </button>
-      )}
+      <button
+        onClick={toggleSpeechRecognition}
+        className={`w-fit p-3 rounded-md font-medium transition-colors ${
+          isListening
+            ? "bg-red-500 hover:bg-red-600 text-white"
+            : "bg-blue-500 hover:bg-blue-600 text-white"
+        }`}
+      >
+        {isListening ? "Stop Listening" : "Start Voice Recognition"}
+      </button>
+
+      <div>
+        <p>{remainingSeconds}</p>
+      </div>
 
       {(isRunning || isPaused) && (
         <div>
@@ -85,10 +87,6 @@ export default function Home() {
           </button>
         </div>
       )}
-
-      <div>
-        <p>{remainingSeconds}</p>
-      </div>
     </div>
   );
 }
