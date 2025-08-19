@@ -1,11 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-
-const TIMER_SPEECH_GRAMMAR_CONFIG = {
-  grammar: `#JSGF V1.0; grammar timer; public <timer> = (set | start | create) (a | an) timer for <number> <unit> | <number> <unit> timer | timer for <number> <unit>; <number> = one | two | three | four | five | six | seven | eight | nine | ten | eleven | twelve | thirteen | fourteen | fifteen | sixteen | seventeen | eighteen | nineteen | twenty | thirty | forty | fifty | sixty | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 30 | 40 | 50 | 60; <unit> = minute | minutes | second | seconds | hour | hours;`,
-  language: "en-US",
-  maxAlternatives: 1,
-} as const;
-
 interface VoiceTranscriptHandler {
   (transcript: string): void;
 }
@@ -17,22 +10,14 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Browser compatibility
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
-      const SpeechGrammarList =
-        window.SpeechGrammarList || window.webkitSpeechGrammarList;
 
-      if (SpeechRecognition && SpeechGrammarList) {
+      if (SpeechRecognition) {
         const recognitionInstance = new SpeechRecognition();
-        const grammarList = new SpeechGrammarList();
-        grammarList.addFromString(TIMER_SPEECH_GRAMMAR_CONFIG.grammar, 1);
-        recognitionInstance.grammars = grammarList;
         recognitionInstance.continuous = false;
-        recognitionInstance.lang = TIMER_SPEECH_GRAMMAR_CONFIG.language;
         recognitionInstance.interimResults = false;
-        recognitionInstance.maxAlternatives =
-          TIMER_SPEECH_GRAMMAR_CONFIG.maxAlternatives;
+        recognitionInstance.maxAlternatives = 1;
 
         recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
           const recognizedText = event.results[0][0].transcript;
