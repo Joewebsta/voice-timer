@@ -16,13 +16,31 @@ export default function Home() {
   } = useTimer();
 
   const handleVoiceInput = (transcript: string) => {
-    const parsedDuration = parseDuration(transcript);
-    const totalSeconds =
-      parsedDuration.hours * 3600 +
-      parsedDuration.minutes * 60 +
-      parsedDuration.seconds;
+    if (
+      transcript.includes("start") ||
+      transcript.includes("create") ||
+      transcript.includes("set")
+    ) {
+      const parsedDuration = parseDuration(transcript);
+      const totalSeconds =
+        parsedDuration.hours * 3600 +
+        parsedDuration.minutes * 60 +
+        parsedDuration.seconds;
 
-    startTimer(totalSeconds);
+      startTimer(totalSeconds);
+    }
+
+    if (transcript.includes("cancel") || transcript.includes("stop")) {
+      stopTimer();
+    }
+
+    if (transcript.includes("pause") || transcript.includes("resume")) {
+      if (isPaused) {
+        resumeTimer();
+      } else {
+        pauseTimer();
+      }
+    }
   };
 
   const { isListening, startListening, stopListening } =
