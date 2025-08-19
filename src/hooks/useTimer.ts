@@ -4,12 +4,14 @@ function useTimer() {
   const intervalIdRef = useRef<null | NodeJS.Timeout>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+  const isPaused =
+    !isRunning && remainingSeconds !== null && remainingSeconds > 0;
 
   useEffect(() => {
-    if (isRunning) {
+    if (isRunning && remainingSeconds !== null && remainingSeconds > 0) {
       const intervalId = setInterval(() => {
         setRemainingSeconds((prevSeconds) => {
-          if (prevSeconds === null || prevSeconds <= 0) {
+          if (prevSeconds === null || prevSeconds <= 1) {
             setIsRunning(false);
             return 0;
           }
@@ -18,35 +20,44 @@ function useTimer() {
       }, 1000);
 
       intervalIdRef.current = intervalId;
+    } else if (!isRunning && intervalIdRef.current) {
+      clearInterval(intervalIdRef.current);
+      intervalIdRef.current = null;
     }
-  }, [isRunning]);
+
+    return () => {
+      if (intervalIdRef.current) {
+        clearInterval(intervalIdRef.current);
+      }
+    };
+  }, [isRunning, remainingSeconds]);
 
   const startTimer = (durationInSeconds: number) => {
     setRemainingSeconds(durationInSeconds);
     setIsRunning(true);
   };
 
-  const stopTimer = () => {
-    console.log("Stopping timer");
-    if (intervalIdRef.current) {
-      clearInterval(intervalIdRef.current);
-      intervalIdRef.current = null;
-      resetTimer();
-    }
+  const pauseTimer = () => {
+    setIsRunning(false);
   };
 
-  const resetTimer = () => {
-    setRemainingSeconds(null);
+  const resumeTimer = () => {
+    setIsRunning(true);
+  };
+
+  const stopTimer = () => {
     setIsRunning(false);
+    setRemainingSeconds(null);
   };
 
   return {
     isRunning,
+    isPaused,
     remainingSeconds,
-    setRemainingSeconds,
     startTimer,
     stopTimer,
-    resetTimer,
+    pauseTimer,
+    resumeTimer,
   };
 }
 
