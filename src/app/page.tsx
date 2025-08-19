@@ -5,7 +5,15 @@ import { useTimer } from "@/hooks/useTimer";
 import { parseDuration } from "@/utils/utils";
 
 export default function Home() {
-  const { remainingSeconds, isRunning, startTimer, stopTimer } = useTimer();
+  const {
+    remainingSeconds,
+    isRunning,
+    isPaused,
+    startTimer,
+    stopTimer,
+    pauseTimer,
+    resumeTimer,
+  } = useTimer();
 
   const handleVoiceInput = (transcript: string) => {
     const parsedDuration = parseDuration(transcript);
@@ -20,7 +28,7 @@ export default function Home() {
   const { isListening, startListening, stopListening } =
     useSpeechRecognition(handleVoiceInput);
 
-  const handleClick = async () => {
+  const toggleSpeechRecognition = async () => {
     if (isListening) {
       stopListening();
     } else {
@@ -30,9 +38,9 @@ export default function Home() {
 
   return (
     <div>
-      {isRunning ? null : (
+      {!isRunning && !isPaused && (
         <button
-          onClick={handleClick}
+          onClick={toggleSpeechRecognition}
           className={`w-fit p-3 rounded-md font-medium transition-colors ${
             isListening
               ? "bg-red-500 hover:bg-red-600 text-white"
@@ -43,7 +51,7 @@ export default function Home() {
         </button>
       )}
 
-      {isRunning && (
+      {(isRunning || isPaused) && (
         <div>
           <button
             onClick={stopTimer}
@@ -51,8 +59,11 @@ export default function Home() {
           >
             Cancel
           </button>
-          <button className="w-fit border p-3 rounded-md font-medium transition-colors">
-            Pause
+          <button
+            onClick={isPaused ? resumeTimer : pauseTimer}
+            className="w-fit border p-3 rounded-md font-medium transition-colors"
+          >
+            {isPaused ? "Resume" : "Pause"}
           </button>
         </div>
       )}
