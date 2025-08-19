@@ -2,7 +2,7 @@
 
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
-import { parseDuration } from "@/utils/utils";
+import { findCommandType, parseDuration } from "@/utils/utils";
 
 export default function Home() {
   const {
@@ -16,11 +16,9 @@ export default function Home() {
   } = useTimer();
 
   const handleVoiceInput = (transcript: string) => {
-    if (
-      transcript.includes("start") ||
-      transcript.includes("create") ||
-      transcript.includes("set")
-    ) {
+    const commandType = findCommandType(transcript);
+
+    if (commandType === "start") {
       const parsedDuration = parseDuration(transcript);
       const totalSeconds =
         parsedDuration.hours * 3600 +
@@ -30,16 +28,16 @@ export default function Home() {
       startTimer(totalSeconds);
     }
 
-    if (transcript.includes("cancel") || transcript.includes("stop")) {
+    if (commandType === "stop") {
       stopTimer();
     }
 
-    if (transcript.includes("pause") || transcript.includes("resume")) {
-      if (isPaused) {
-        resumeTimer();
-      } else {
-        pauseTimer();
-      }
+    if (commandType === "pause") {
+      pauseTimer();
+    }
+
+    if (commandType === "resume") {
+      resumeTimer();
     }
   };
 

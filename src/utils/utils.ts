@@ -48,4 +48,32 @@ function parseDurationFromTranscript(transcript: string) {
   return duration;
 }
 
-export { parseDurationFromTranscript as parseDuration };
+const findCommandType = (transcript: string): string | null => {
+  const COMMAND_ALIASES = {
+    start: [
+      "start",
+      "create",
+      "set",
+      "begin",
+      "launch",
+      "initiate",
+      "make",
+      "new",
+    ],
+    stop: ["stop", "cancel", "end", "terminate", "quit", "abort", "kill"],
+    pause: ["pause", "suspend", "hold", "freeze", "wait"],
+    resume: ["resume", "continue", "unpause", "restart", "proceed", "go"],
+  };
+
+  const words = transcript.toLowerCase().split(/\s+/);
+
+  for (const [command, aliases] of Object.entries(COMMAND_ALIASES)) {
+    if (aliases.some((alias) => words.includes(alias))) {
+      return command;
+    }
+  }
+
+  return null;
+};
+
+export { parseDurationFromTranscript as parseDuration, findCommandType };
