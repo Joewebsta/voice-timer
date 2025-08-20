@@ -3,6 +3,7 @@
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { findCommandType, parseDuration, formatTime } from "@/utils/utils";
+import TimeCounter from "@/app/components/ui/time-counter";
 
 export default function Home() {
   const {
@@ -57,9 +58,14 @@ export default function Home() {
       <div className="w-full flex flex-col gap-6 items-center">
         <div className="border rounded-lg flex flex-col justify-center items-center w-full h-[400px] gap-6 max-w-5xl">
           <div className="relative">
-            <p className="text-[80px] leading-none">
-              {formatTime(remainingSeconds ?? 0)}
-            </p>
+            <TimeCounter
+              seconds={remainingSeconds ?? 0}
+              fontSize={80}
+              padding={5}
+              gap={10}
+              textColor="black"
+              fontWeight={900}
+            />
 
             {(isRunning || isPaused) && (
               <div className="flex gap-4 absolute left-1/2 top-full transform -translate-x-1/2 mt-10">
