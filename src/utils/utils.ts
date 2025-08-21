@@ -76,22 +76,4 @@ const findCommandType = (transcript: string): string | null => {
   return null;
 };
 
-const formatTime = (totalSeconds: number): string => {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
-      .toString()
-      .padStart(2, "0")}`;
-  }
-
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-};
-
-export {
-  parseDurationFromTranscript as parseDuration,
-  findCommandType,
-  formatTime,
-};
+export { parseDurationFromTranscript as parseDuration, findCommandType };
