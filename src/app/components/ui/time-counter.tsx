@@ -33,7 +33,6 @@ export default function TimeCounter({
 
   const defaultContainerStyle: React.CSSProperties = {
     display: "flex",
-    alignItems: "center",
     gap: gap,
   };
 
