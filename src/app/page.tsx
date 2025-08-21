@@ -2,6 +2,7 @@
 
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { findCommandType, parseDuration } from "@/utils/utils";
 import TimeCounter from "@/app/components/ui/time-counter";
 
@@ -15,6 +16,8 @@ export default function Home() {
     pauseTimer,
     resumeTimer,
   } = useTimer();
+
+  useDocumentTitle(remainingSeconds);
 
   const handleVoiceInput = (transcript: string) => {
     const commandType = findCommandType(transcript);
