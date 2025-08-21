@@ -2,7 +2,7 @@
 
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
-import { findCommandType, parseDuration, formatTime } from "@/utils/utils";
+import { findCommandType, parseDuration } from "@/utils/utils";
 import TimeCounter from "@/app/components/ui/time-counter";
 
 export default function Home() {
