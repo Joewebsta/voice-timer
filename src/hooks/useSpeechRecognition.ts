@@ -12,22 +12,6 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   const [listeningMode, setListeningMode] =
     useState<ListeningMode>("wake-word");
 
-  const isListeningRef = useRef(isListening);
-  const listeningModeRef = useRef(listeningMode);
-  const onTranscriptReceivedRef = useRef(onTranscriptReceived);
-
-  useEffect(() => {
-    listeningModeRef.current = listeningMode;
-  }, [listeningMode]);
-
-  useEffect(() => {
-    isListeningRef.current = isListening;
-  }, [isListening]);
-
-  useEffect(() => {
-    onTranscriptReceivedRef.current = onTranscriptReceived;
-  }, [onTranscriptReceived]);
-
   const startListening = useCallback(() => {
     if (speechRecognitionInstance.current) {
       setIsListening(true);
@@ -56,42 +40,6 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
         recognitionInstance.interimResults = true;
         recognitionInstance.maxAlternatives = 1;
 
-        recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
-          const results = event.results;
-          const lastResult = results[results.length - 1];
-
-          if (lastResult.isFinal) {
-            const recognizedText = lastResult[0].transcript.toLowerCase();
-            console.log("lastResult", recognizedText);
-
-            if (listeningModeRef.current === "wake-word") {
-              if (recognizedText.includes("hey timer")) {
-                console.log("Wake word detected - transition to command mode");
-                setListeningMode("command");
-                // Optional: Play feedback sound
-              }
-            } else if (listeningModeRef.current === "command") {
-              console.log("Command detected - process the command");
-              console.log("recognizedText", recognizedText);
-              onTranscriptReceivedRef.current(recognizedText);
-              setListeningMode("wake-word");
-            }
-          }
-        };
-
-        recognitionInstance.onend = () => {
-          console.log("Recognition ended");
-          if (isListeningRef.current) {
-            setTimeout(() => {
-              recognitionInstance.start();
-            }, 100);
-          }
-        };
-
-        recognitionInstance.onerror = (event) => {
-          setRecognitionError(`Speech recognition error: ${event.error}`);
-        };
-
         speechRecognitionInstance.current = recognitionInstance;
 
         setIsListening(true);
@@ -102,6 +50,9 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
 
     return () => {
       if (speechRecognitionInstance.current) {
+        speechRecognitionInstance.current.onresult = null;
+        speechRecognitionInstance.current.onend = null;
+        speechRecognitionInstance.current.onerror = null;
         speechRecognitionInstance.current.stop();
         speechRecognitionInstance.current.abort();
       }
@@ -109,6 +60,45 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
       speechRecognitionInstance.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const instance = speechRecognitionInstance.current;
+    if (!instance) return;
+
+    instance.onresult = (event: SpeechRecognitionEvent) => {
+      const results = event.results;
+      const lastResult = results[results.length - 1];
+
+      if (lastResult.isFinal) {
+        const recognizedText = lastResult[0].transcript.toLowerCase();
+        console.log("Recognized text:", recognizedText);
+
+        if (listeningMode === "wake-word") {
+          if (recognizedText.includes("hey timer")) {
+            console.log("Wake word detected - transition to command mode");
+            setListeningMode("command");
+          }
+        } else if (listeningMode === "command") {
+          console.log("Command detected - process the command");
+          onTranscriptReceived(recognizedText);
+          setListeningMode("wake-word");
+        }
+      }
+    };
+
+    instance.onend = () => {
+      console.log("Recognition ended");
+      if (isListening) {
+        setTimeout(() => {
+          instance.start();
+        }, 100);
+      }
+    };
+
+    instance.onerror = (event) => {
+      setRecognitionError(`Speech recognition error: ${event.error}`);
+    };
+  }, [isListening, listeningMode, onTranscriptReceived]);
 
   return {
     isListening,
