@@ -45,7 +45,7 @@ export default function Home() {
     }
   };
 
-  const { isListening, startListening, stopListening } =
+  const { isListening, listeningMode, startListening, stopListening } =
     useSpeechRecognition(handleVoiceInput);
 
   const toggleSpeechRecognition = async () => {
@@ -98,6 +98,7 @@ export default function Home() {
         >
           {isListening ? "Stop Listening" : "Start Voice Recognition"}
         </button>
+        <p className="text-sm text-gray-500">Listening mode: {listeningMode}</p>
       </div>
     </div>
   );

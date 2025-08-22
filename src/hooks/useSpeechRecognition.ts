@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 interface VoiceTranscriptHandler {
   (transcript: string): void;
 }
@@ -7,13 +7,14 @@ type ListeningMode = "wake-word" | "command";
 
 function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   const speechRecognitionInstance = useRef<SpeechRecognition | null>(null);
-  const [isListening, setIsListening] = useState(false);
+  const [isListening, setIsListening] = useState(true);
   const [recognitionError, setRecognitionError] = useState("");
   const [listeningMode, setListeningMode] =
     useState<ListeningMode>("wake-word");
 
   const isListeningRef = useRef(isListening);
   const listeningModeRef = useRef(listeningMode);
+  const onTranscriptReceivedRef = useRef(onTranscriptReceived);
 
   useEffect(() => {
     listeningModeRef.current = listeningMode;
@@ -22,6 +23,27 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   useEffect(() => {
     isListeningRef.current = isListening;
   }, [isListening]);
+
+  useEffect(() => {
+    onTranscriptReceivedRef.current = onTranscriptReceived;
+  }, [onTranscriptReceived]);
+
+  const startListening = useCallback(() => {
+    if (speechRecognitionInstance.current) {
+      setIsListening(true);
+      speechRecognitionInstance.current.start();
+      console.log("Started continuous listening for wake word");
+    }
+  }, []);
+
+  const stopListening = useCallback(() => {
+    if (speechRecognitionInstance.current) {
+      setIsListening(false);
+      speechRecognitionInstance.current.stop();
+      speechRecognitionInstance.current.abort();
+      console.log("Stopped continuous listening");
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -51,7 +73,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
             } else if (listeningModeRef.current === "command") {
               console.log("Command detected - process the command");
               console.log("recognizedText", recognizedText);
-              onTranscriptReceived(recognizedText);
+              onTranscriptReceivedRef.current(recognizedText);
               setListeningMode("wake-word");
             }
           }
@@ -68,10 +90,13 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
 
         recognitionInstance.onerror = (event) => {
           setRecognitionError(`Speech recognition error: ${event.error}`);
-          setIsListening(false);
         };
 
         speechRecognitionInstance.current = recognitionInstance;
+
+        setIsListening(true);
+        recognitionInstance.start();
+        console.log("Started continuous listening for wake word");
       }
     }
 
@@ -83,24 +108,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
 
       speechRecognitionInstance.current = null;
     };
-  }, [onTranscriptReceived, listeningMode, isListening]);
-
-  const startListening = () => {
-    if (speechRecognitionInstance.current) {
-      setIsListening(true);
-      speechRecognitionInstance.current.start();
-      console.log("Started continuous listening for wake word");
-    }
-  };
-
-  const stopListening = () => {
-    if (speechRecognitionInstance.current) {
-      setIsListening(false);
-      speechRecognitionInstance.current.stop();
-      speechRecognitionInstance.current.abort();
-      console.log("Stopped continuous listening");
-    }
-  };
+  }, []);
 
   return {
     isListening,
