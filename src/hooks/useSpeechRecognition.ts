@@ -29,6 +29,22 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
     }
   }, []);
 
+  const handleRecognizedText = useCallback(
+    (recognizedText: string) => {
+      if (listeningMode === "wake-word") {
+        if (recognizedText.includes("hey timer")) {
+          console.log("Wake word detected - transition to command mode");
+          setListeningMode("command");
+        }
+      } else if (listeningMode === "command") {
+        console.log("Command detected - process the command");
+        onTranscriptReceived(recognizedText);
+        setListeningMode("wake-word");
+      }
+    },
+    [listeningMode, onTranscriptReceived]
+  );
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition =
@@ -72,17 +88,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
       if (lastResult.isFinal) {
         const recognizedText = lastResult[0].transcript.toLowerCase();
         console.log("Recognized text:", recognizedText);
-
-        if (listeningMode === "wake-word") {
-          if (recognizedText.includes("hey timer")) {
-            console.log("Wake word detected - transition to command mode");
-            setListeningMode("command");
-          }
-        } else if (listeningMode === "command") {
-          console.log("Command detected - process the command");
-          onTranscriptReceived(recognizedText);
-          setListeningMode("wake-word");
-        }
+        handleRecognizedText(recognizedText);
       }
     };
 
@@ -98,7 +104,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
     instance.onerror = (event) => {
       setRecognitionError(`Speech recognition error: ${event.error}`);
     };
-  }, [isListening, listeningMode, onTranscriptReceived]);
+  }, [isListening, handleRecognizedText]);
 
   return {
     isListening,
