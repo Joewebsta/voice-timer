@@ -52,7 +52,8 @@ function useTimer() {
         clearInterval(intervalIdRef.current);
       }
     };
-  }, [isRunning, remainingSeconds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRunning]);
 
   const startTimer = (durationInSeconds: number) => {
     setRemainingSeconds(durationInSeconds);
