@@ -11,7 +11,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   const [recognitionError, setRecognitionError] = useState("");
   const [listeningMode, setListeningMode] =
     useState<ListeningMode>("wake-word");
-
+  const listeningModeAudioRef = useRef<HTMLAudioElement | null>(null);
   const startListening = useCallback(() => {
     if (speechRecognitionInstance.current) {
       setIsListening(true);
@@ -34,10 +34,12 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
       if (listeningMode === "wake-word") {
         if (recognizedText.includes("hey timer")) {
           console.log("Wake word detected - transition to command mode");
+          listeningModeAudioRef.current?.play();
           setListeningMode("command");
         }
       } else if (listeningMode === "command") {
         console.log("Command detected - process the command");
+        listeningModeAudioRef.current?.play();
         onTranscriptReceived(recognizedText);
         setListeningMode("wake-word");
       }
@@ -105,6 +107,14 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
       setRecognitionError(`Speech recognition error: ${event.error}`);
     };
   }, [isListening, handleRecognizedText]);
+
+  useEffect(() => {
+    if (!listeningModeAudioRef.current) {
+      listeningModeAudioRef.current = new Audio(
+        "/audio/confirmation-tone-2867.wav"
+      );
+    }
+  }, []);
 
   return {
     isListening,

@@ -57,13 +57,13 @@ export default function Home() {
   };
 
   return (
-    <div className="h-dvh flex justify-center items-center p-4">
-      <div className="w-full flex flex-col gap-6 items-center">
-        <div className="border rounded-lg flex flex-col justify-center items-center w-full h-[400px] gap-6 max-w-5xl">
+    <div className="h-dvh flex justify-center items-center p-4 bg-[#4CBEB1]">
+      <div className="w-full h-full flex flex-col gap-6 justify-center items-center">
+        <div className="border-4 border-[#002F34] rounded-4xl flex flex-col items-center w-full h-9/10 gap-6 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center">
           <div className="relative">
             <TimeCounter
               seconds={remainingSeconds ?? 0}
-              fontSize={80}
+              fontSize={40}
               padding={5}
               gap={10}
               textColor="black"
@@ -88,7 +88,7 @@ export default function Home() {
             )}
           </div>
         </div>
-        <button
+        {/* <button
           onClick={toggleSpeechRecognition}
           className={`w-fit p-3 rounded-md font-medium transition-colors ${
             isListening
@@ -97,8 +97,17 @@ export default function Home() {
           }`}
         >
           {isListening ? "Stop Listening" : "Start Voice Recognition"}
-        </button>
-        <p className="text-sm text-gray-500">Listening mode: {listeningMode}</p>
+        </button>*/}
+        <p className="text-base text-[#002F34]">
+          {" "}
+          {listeningMode === "wake-word" ? (
+            <>
+              Say <em className="font-bold">&quot;Hey Timer&quot;</em>
+            </>
+          ) : (
+            "What's your command?"
+          )}
+        </p>
       </div>
     </div>
   );

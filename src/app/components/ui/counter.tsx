@@ -129,7 +129,7 @@ export default function Counter({
 
   const defaultTopGradientStyle: React.CSSProperties = {
     height: gradientHeight,
-    background: `linear-gradient(to bottom, white 0%, transparent 100%)`,
+    background: `linear-gradient(to bottom, #4CBEB1 0%, transparent 100%)`,
   };
 
   const defaultBottomGradientStyle: React.CSSProperties = {
@@ -137,7 +137,7 @@ export default function Counter({
     bottom: 0,
     width: "100%",
     height: gradientHeight,
-    background: `linear-gradient(to top, white 0%, transparent 100%)`,
+    background: `linear-gradient(to top, #4CBEB1 0%, transparent 100%)`,
   };
 
   return (
