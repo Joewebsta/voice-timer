@@ -3,7 +3,6 @@
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { findCommandType, parseDuration } from "@/utils/utils";
 import TimeCounter from "@/app/components/ui/time-counter";
 
 export default function Home() {
@@ -19,30 +18,18 @@ export default function Home() {
 
   useDocumentTitle(remainingSeconds);
 
-  const handleVoiceInput = (transcript: string) => {
-    const commandType = findCommandType(transcript);
+  const handleVoiceInput = async (transcript: string) => {
+    const response = await fetch("/api/timer", {
+      method: "POST",
+      body: JSON.stringify({ transcript }),
+    });
 
-    if (commandType === "start") {
-      const parsedDuration = parseDuration(transcript);
-      const totalSeconds =
-        parsedDuration.hours * 3600 +
-        parsedDuration.minutes * 60 +
-        parsedDuration.seconds;
+    const { command, totalSeconds } = await response.json();
 
-      startTimer(totalSeconds);
-    }
-
-    if (commandType === "stop") {
-      stopTimer();
-    }
-
-    if (commandType === "pause") {
-      pauseTimer();
-    }
-
-    if (commandType === "resume") {
-      resumeTimer();
-    }
+    if (command === "start") startTimer(totalSeconds);
+    if (command === "stop") stopTimer();
+    if (command === "pause") pauseTimer();
+    if (command === "resume") resumeTimer();
   };
 
   const { isListening, listeningMode, startListening, stopListening } =
@@ -75,7 +62,7 @@ export default function Home() {
             )}
           </p>
         </div>
-        <div className="border-4 border-[#002F34] rounded-4xl flex flex-col items-center w-full h-9/10 gap-6 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center">
+        <div className="border-4 border-[#002F34] rounded-4xl flex flex-col items-center w-full h-9/10 sm:h-[700px] gap-6 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center">
           <div className="h-1/2 flex items-center justify-center">
             <div className="relative">
               <TimeCounter
