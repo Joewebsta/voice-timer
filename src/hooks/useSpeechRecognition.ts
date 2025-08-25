@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 interface VoiceTranscriptHandler {
-  (transcript: string): void;
+  (transcript: string): Promise<void>;
 }
 
 type ListeningMode = "wake-word" | "command";
@@ -12,6 +12,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   const [listeningMode, setListeningMode] =
     useState<ListeningMode>("wake-word");
   const listeningModeAudioRef = useRef<HTMLAudioElement | null>(null);
+
   const startListening = useCallback(() => {
     if (speechRecognitionInstance.current) {
       setIsListening(true);
@@ -30,7 +31,7 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   }, []);
 
   const handleRecognizedText = useCallback(
-    (recognizedText: string) => {
+    async (recognizedText: string) => {
       if (listeningMode === "wake-word") {
         if (recognizedText.includes("hey timer")) {
           console.log("Wake word detected - transition to command mode");
@@ -39,8 +40,8 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
         }
       } else if (listeningMode === "command") {
         console.log("Command detected - process the command");
+        await onTranscriptReceived(recognizedText);
         listeningModeAudioRef.current?.play();
-        onTranscriptReceived(recognizedText);
         setListeningMode("wake-word");
       }
     },
