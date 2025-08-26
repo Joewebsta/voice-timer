@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { formatTime } from "@/utils/utils";
+import { formatTime } from "@/utils/timeUtils";
 
 export const useDocumentTitle = (remainingSeconds: number | null) => {
   useEffect(() => {
