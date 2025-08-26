@@ -4,7 +4,7 @@ import TimeCounter from "@/app/components/ui/time-counter";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
-import { parseDuration } from "@/utils/utils";
+import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 
 export default function Home() {
   const {
@@ -17,41 +17,19 @@ export default function Home() {
     resumeTimer,
   } = useTimer();
 
-  useDocumentTitle(remainingSeconds);
-
-  const handleVoiceInput = async (transcript: string) => {
-    if (transcript.includes("start")) {
-      const durationData = parseDuration(transcript);
-      const totalSeconds =
-        durationData.hours * 3600 +
-        durationData.minutes * 60 +
-        durationData.seconds;
-      startTimer(totalSeconds);
-    } else if (transcript.includes("stop")) {
-      stopTimer();
-    } else if (transcript.includes("pause")) {
-      pauseTimer();
-    } else if (transcript.includes("resume")) {
-      resumeTimer();
-    } else {
-      const response = await fetch("/api/timer", {
-        method: "POST",
-        body: JSON.stringify({ transcript }),
-      });
-
-      const responseData = await response.json();
-      const totalSeconds = responseData.totalSeconds;
-      const command = responseData.command;
-
-      if (command === "start") startTimer(totalSeconds);
-      if (command === "stop") stopTimer();
-      if (command === "pause") pauseTimer();
-      if (command === "resume") resumeTimer();
-    }
+  const timerActions = {
+    startTimer,
+    stopTimer,
+    pauseTimer,
+    resumeTimer,
   };
+
+  const { handleVoiceInput } = useVoiceCommands(timerActions);
 
   const { isListening, listeningMode, startListening, stopListening } =
     useSpeechRecognition(handleVoiceInput);
+
+  useDocumentTitle(remainingSeconds);
 
   const toggleSpeechRecognition = async () => {
     if (isListening) {
