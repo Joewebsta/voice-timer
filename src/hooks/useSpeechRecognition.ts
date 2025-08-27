@@ -33,7 +33,10 @@ function useSpeechRecognition(onTranscriptReceived: VoiceTranscriptHandler) {
   const handleRecognizedText = useCallback(
     async (recognizedText: string) => {
       if (listeningMode === "wake-word") {
-        if (recognizedText.includes("hey timer")) {
+        if (
+          recognizedText.includes("hey timer") ||
+          recognizedText.includes("a timer")
+        ) {
           console.log("Wake word detected - transition to command mode");
           listeningModeAudioRef.current?.play();
           setListeningMode("command");
