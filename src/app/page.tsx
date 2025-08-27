@@ -5,6 +5,7 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
+import { Mic, MicOff } from "lucide-react";
 
 export default function Home() {
   const {
@@ -58,7 +59,7 @@ export default function Home() {
             )}
           </p>
         </div>
-        <div className="border-4 border-[#002F34] rounded-4xl flex flex-col items-center w-full h-9/10 sm:h-[700px] gap-6 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center">
+        <div className="border-4 border-[#002F34] rounded-4xl  relative flex flex-col items-center w-full h-9/10 sm:h-[700px] gap-6 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center">
           <div className="h-1/2 flex items-center justify-center">
             <div className="relative">
               <TimeCounter
@@ -91,17 +92,13 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div>
-        {/* <button
+          <button
             onClick={toggleSpeechRecognition}
-            className={`w-fit p-3 rounded-md font-medium transition-colors ${
-              isListening
-                ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            }`}
+            className={` absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-fit p-2 sm:p-3 rounded-full font-medium transition-colors border-2 border-[#4CBEB1] cursor-pointer`}
           >
-            {isListening ? "Stop Listening" : "Start Voice Recognition"}
-          </button>*/}
+            {isListening ? <Mic color="#4CBEB1" /> : <MicOff color="#4CBEB1" />}
+          </button>
+        </div>
       </div>
     </div>
   );
