@@ -5,11 +5,14 @@ import TimeCounter from "@/app/components/ui/time-counter";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
+import { useViewport } from "@/hooks/useViewport";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
 import { Mic, MicOff } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 export default function Home() {
+  const { viewportWidth } = useViewport();
+
   const {
     remainingSeconds,
     isRunning,
@@ -109,14 +112,11 @@ export default function Home() {
               >
                 <TimeCounter
                   seconds={remainingSeconds ?? 0}
-                  fontSize={40}
+                  fontSize={viewportWidth < 640 ? 50 : 80}
                   padding={5}
                   gap={10}
                   textColor="black"
                   fontWeight={900}
-                  counterStyle={{
-                    fontSize: "clamp(24px, 4vw + 16px, 80px)",
-                  }}
                 />
 
                 {(isRunning || isPaused) && (
@@ -144,7 +144,7 @@ export default function Home() {
             </div>
             <motion.button
               onClick={toggleSpeechRecognition}
-              className={`absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-fit p-2 sm:p-3 rounded-full font-medium transition-colors border-2 border-[#4CBEB1] cursor-pointer`}
+              className={`absolute bottom-3 right-3 w-fit p-2 sm:p-3 rounded-full font-medium transition-colors border-2 border-[#4CBEB1] cursor-pointer`}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
