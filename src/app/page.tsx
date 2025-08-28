@@ -7,7 +7,7 @@ import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { useViewport } from "@/hooks/useViewport";
 import { useVoiceCommands } from "@/hooks/useVoiceCommands";
-import { Mic, MicOff } from "lucide-react";
+import { Mic, MicOff, Pause, Play, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 export default function Home() {
@@ -75,7 +75,7 @@ export default function Home() {
 
         {/* Timer content positioned absolutely over Silk */}
         <motion.div
-          className="absolute inset-0 flex flex-col gap-6 justify-center items-center z-10 p-4"
+          className="absolute inset-0 flex flex-col gap-6 justify-center items-center z-10 p-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -98,7 +98,7 @@ export default function Home() {
             </p>
           </motion.div>
           <motion.div
-            className="border-4 border-[#002F34] rounded-4xl relative flex flex-col items-center w-full h-9/10 sm:h-[700px] gap-6 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center"
+            className="border-4 border-[#002F34] rounded-4xl relative flex flex-col items-center w-full h-9/10 sm:h-[700px] gap-5 max-w-5xl bg-[url(/forest-background.png)] bg-cover bg-center"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
@@ -119,27 +119,66 @@ export default function Home() {
                   fontWeight={900}
                 />
 
-                {(isRunning || isPaused) && (
-                  <motion.div
-                    className="flex gap-4 absolute left-1/2 top-full transform -translate-x-1/2 mt-10"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.7, ease: "easeOut" }}
-                  >
-                    <button
-                      onClick={stopTimer}
-                      className="border p-3 rounded-md font-medium transition-colors w-[86px]"
+                <AnimatePresence>
+                  {(isRunning || isPaused) && (
+                    <motion.div
+                      key="timer-controls"
+                      className="flex gap-4 absolute left-1/2 top-full transform -translate-x-1/2 mt-8"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
                     >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={isPaused ? resumeTimer : pauseTimer}
-                      className="border p-3 rounded-md font-medium transition-colors w-[86px]"
-                    >
-                      {isPaused ? "Resume" : "Pause"}
-                    </button>
-                  </motion.div>
-                )}
+                      <button
+                        onClick={stopTimer}
+                        className="border py-2 px-4 rounded-md text-medium font-medium transition-colors hover:bg-[#149B92]/30 bg-opacity-50 hover:bg-opacity-40 cursor-pointer flex items-center gap-2 justify-center min-w-[118px]"
+                      >
+                        <X size={16} strokeWidth={2} />
+                        Cancel
+                      </button>
+                      <button
+                        onClick={isPaused ? resumeTimer : pauseTimer}
+                        className="border py-2 px-4 rounded-md text-medium font-medium transition-all cursor-pointer hover:bg-[#149B92]/30 bg-opacity-50 hover:bg-opacity-40 min-w-[118px] "
+                      >
+                        <AnimatePresence mode="wait">
+                          {isPaused ? (
+                            <motion.div
+                              key="resume"
+                              className="flex items-center gap-2 justify-center"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.2, ease: "easeInOut" }}
+                            >
+                              <Play
+                                size={16}
+                                className="flex-shrink-0"
+                                strokeWidth={2}
+                              />
+                              Resume
+                            </motion.div>
+                          ) : (
+                            <motion.div
+                              key="pause"
+                              className="flex items-center gap-2 justify-center"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.2, ease: "easeInOut" }}
+                            >
+                              <Pause
+                                size={16}
+                                className="flex-shrink-0"
+                                strokeWidth={2}
+                              />
+                              Pause
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             </div>
             <motion.button
