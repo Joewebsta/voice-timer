@@ -34,6 +34,7 @@ export default function TimeCounter({
   const defaultContainerStyle: React.CSSProperties = {
     display: "flex",
     gap: gap,
+    fontFamily: "var(--font-outfit)",
   };
 
   const colonStyle: React.CSSProperties = {

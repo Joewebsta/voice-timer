@@ -112,10 +112,10 @@ export default function Home() {
               >
                 <TimeCounter
                   seconds={remainingSeconds ?? 0}
-                  fontSize={viewportWidth < 640 ? 50 : 80}
+                  fontSize={viewportWidth < 640 ? 45 : 80}
                   padding={5}
                   gap={10}
-                  textColor="black"
+                  textColor="#002F34"
                   fontWeight={900}
                 />
 
@@ -131,14 +131,14 @@ export default function Home() {
                     >
                       <button
                         onClick={stopTimer}
-                        className="border py-2 px-4 rounded-md text-medium font-medium transition-colors hover:bg-[#149B92]/30 bg-opacity-50 hover:bg-opacity-40 cursor-pointer flex items-center gap-2 justify-center min-w-[118px]"
+                        className="border border-[#002F34] text-[#002F34] py-2 px-4 rounded-md text-medium font-medium transition-colors hover:bg-[#149B92]/30 bg-opacity-50 hover:bg-opacity-40 cursor-pointer flex items-center gap-2 justify-center min-w-[118px]"
                       >
-                        <X size={16} strokeWidth={2} />
+                        <X size={16} strokeWidth={2} color="#002F34" />
                         Cancel
                       </button>
                       <button
                         onClick={isPaused ? resumeTimer : pauseTimer}
-                        className="border py-2 px-4 rounded-md text-medium font-medium transition-all cursor-pointer hover:bg-[#149B92]/30 bg-opacity-50 hover:bg-opacity-40 min-w-[118px] "
+                        className="border border-[#002F34] text-[#002F34] py-2 px-4 rounded-md text-medium font-medium transition-all cursor-pointer hover:bg-[#149B92]/30 bg-opacity-50 hover:bg-opacity-40 min-w-[118px] "
                       >
                         <AnimatePresence mode="wait">
                           {isPaused ? (
@@ -154,6 +154,7 @@ export default function Home() {
                                 size={16}
                                 className="flex-shrink-0"
                                 strokeWidth={2}
+                                color="#002F34"
                               />
                               Resume
                             </motion.div>
@@ -170,6 +171,7 @@ export default function Home() {
                                 size={16}
                                 className="flex-shrink-0"
                                 strokeWidth={2}
+                                color="#002F34"
                               />
                               Pause
                             </motion.div>
